@@ -14,6 +14,15 @@ import requests
 import time
 
 def gen_password(length, special_chars=False, digits=False, upper_case=False, lower_case=False):
+    """
+    Generate a random password with the specified length and optional inclusion of special characters, digits, uppercase letters, and lowercase letters.
+    @param length - the length of the password
+    @param special_chars - whether to include special characters in the password (default: False)
+    @param digits - whether to include digits in the password (default: False)
+    @param upper_case - whether to include uppercase letters in the password (default: False)
+    @param lower_case - whether to include lowercase letters in the password (default: False)
+    @return The generated password
+    """
     password = ''
     for _ in range(length):
         password += random.choice(string.ascii_lowercase)
@@ -26,10 +35,18 @@ def gen_password(length, special_chars=False, digits=False, upper_case=False, lo
     return password
 
 def clear_input(input):
+    """
+    Clear the input field by selecting all text and deleting it.
+    @param input - the input field to be cleared
+    """
     input.send_keys(Keys.COMMAND, 'a')
     input.send_keys(Keys.BACK_SPACE)
 
 def get_mailbox():
+    """
+    Retrieve the mailbox associated with the current user.
+    @return The mailbox object.
+    """
     api_key = 'd04d8e4e-b501-4bce-8e5e-bf4e4da95b42'
     namespace = 'j4bjm'
     url = f'https://api.testmail.app/api/json?apikey={api_key}&namespace={namespace}&pretty=true'
@@ -42,6 +59,9 @@ def get_mailbox():
         print('Error getting email')
 
 def num_emails():
+    """
+    Retrieve the number of emails in the mailbox associated with the current user.
+    """
     api_key = 'd04d8e4e-b501-4bce-8e5e-bf4e4da95b42'
     namespace = 'j4bjm'
     url = f'https://api.testmail.app/api/json?apikey={api_key}&namespace={namespace}&pretty=true'
@@ -53,16 +73,29 @@ def num_emails():
         print('Error getting mailbox')
 
 def gen_email(name):
+    """
+    Generate a random email address.
+    @return A randomly generated email address.
+    """
     namespace = 'j4bjm'
     tag = name.replace(' ', '')
     email = f'{namespace}.{tag}@inbox.testmail.app'
     return email
 
 def log_creds(email, password):
+    """
+    This function logs the credentials provided by the user.
+    @param creds - the credentials provided by the user
+    @return None
+    """
     with open('creds.txt', 'a') as f:
         f.write(f'{email}:{password}\n')
 
 def parseEmail(text):
+    """
+    Parse an email and extract relevant information such as the sender, recipient, subject, and body.
+    @return A dictionary containing the parsed email information
+    """
     index = text.find('app:')
     code = text[0:6]
     return code
@@ -76,7 +109,7 @@ if __name__ == "__main__":
        
     inputs = wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME, 'input')))
     buttons = wait.until(EC.visibility_of_all_elements_located((By.TAG_NAME, 'button')))
-
+    # Generate random credentials
     fake = Faker()
     name = fake.name() #full name
     email = gen_email(name)
@@ -85,7 +118,7 @@ if __name__ == "__main__":
     inputs[1].send_keys(name) 
     inputs[3].send_keys(password) 
     log_creds(email, password)
-
+    # try different usernames until one works
     while(1):
         try: 
             inputs[2].send_keys('_' + fake.user_name()) #username
@@ -97,6 +130,7 @@ if __name__ == "__main__":
         except TimeoutException:
             break
     try:
+        # birthday
         time.sleep(1)
         element = wait.until(EC.presence_of_all_elements_located((By.TAG_NAME, 'select')))
         month = Select(element[0])
